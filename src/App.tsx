@@ -1,15 +1,15 @@
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Model } from "./Table_final";
-import { CameraControls, OrbitControls } from "@react-three/drei";
-import { Debug, Physics } from "@react-three/cannon";
+import { PointerLockControls } from "@react-three/drei";
+import { Physics } from "@react-three/cannon";
+// import { Debug } from "@react-three/cannon";
 import { G } from "./const/world_const";
 import { CubeGenerator } from "./cube/cubeGenerator";
+import CameraController from "./controls/CameraController";
 
 const App = () => {
   return (
     <Canvas>
-      {/* .сверху.(вперед-назад) */}
-      <CameraControls />
       <ambientLight intensity={0.4} />
       <pointLight
         position={[0, 3, 0.3]}
@@ -31,16 +31,8 @@ const App = () => {
         {/* </Debug> */}
       </Physics>
 
-      <OrbitControls
-        position={[1, 0, 0]}
-        enableRotate={true}
-        enablePan={false}
-        rotateSpeed={0.4}
-        // maxPolarAngle={Math.PI / 1.8} //камера сверху
-        // minPolarAngle={Math.PI / 4} //камера снизу
-        // maxAzimuthAngle={Math.PI / 6}
-        // minAzimuthAngle={-Math.PI / 6}
-      />
+      <PointerLockControls />
+      <CameraController />
     </Canvas>
   );
 };
