@@ -6,9 +6,51 @@ import {
   handleWheel,
   handleMouseMove,
 } from "./control_type_1";
+import {
+  camera_moveSpeed,
+  camera_far,
+  camera_fov,
+  camera_near,
+  camera_position_x,
+  camera_position_y,
+  camera_position_z,
+} from "../const/world_const";
+import * as THREE from "three";
 
 const CameraController = () => {
   const { camera, gl } = useThree();
+
+  // Установка начальной позиции камеры
+  useEffect(() => {
+    if (camera instanceof THREE.PerspectiveCamera) {
+      // Настройка параметров перспективной камеры
+      camera.fov = camera_fov; // Уменьшение FOV для уменьшения растяжения
+      camera.aspect = window.innerWidth / window.innerHeight; // Соотношение сторон
+      camera.near = camera_near; // Ближняя плоскость отсечения
+      camera.far = camera_far; // Дальняя плоскость отсечения
+      camera.position.set(
+        camera_position_x,
+        camera_position_y,
+        camera_position_z
+      ); // Начальная позиция камеры
+
+      camera.updateProjectionMatrix(); // Обновление проекционной матрицы камеры
+
+      // Обновление размера холста при изменении размеров окна
+      const handleResize = () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        gl.setSize(window.innerWidth, window.innerHeight);
+      };
+
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }
+  }, [camera, gl]);
+
   const [movement, setMovement] = useState({
     up: false,
     down: false,
@@ -73,11 +115,13 @@ const CameraController = () => {
   }, [camera, ctrlPressed, gl, isDragging]);
 
   useFrame(() => {
-    const speed = 0.1;
-    if (movement.up) camera.position.y += speed;
-    if (movement.down) camera.position.y -= speed;
-    if (movement.left) camera.position.x -= speed;
-    if (movement.right) camera.position.x += speed;
+    if (movement.up) camera.position.y += camera_moveSpeed;
+    if (movement.down) camera.position.y -= camera_moveSpeed;
+    if (movement.left) camera.position.x -= camera_moveSpeed;
+    if (movement.right) camera.position.x += camera_moveSpeed;
+    // console.log(
+    //   `Camera position: x=${camera.position.x}, y=${camera.position.y}, z=${camera.position.z}`
+    // );
   });
 
   return null;

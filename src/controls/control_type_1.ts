@@ -1,4 +1,4 @@
-// cameraControls.ts
+import { camera_rotateSpeed, camera_zoomSpeed } from "../const/world_const";
 
 type MovementState = {
   up: boolean;
@@ -8,11 +8,10 @@ type MovementState = {
 };
 
 export const handleWheel = (camera: THREE.Camera) => (event: WheelEvent) => {
-  const zoomSpeed = 0.5;
   if (event.deltaY < 0) {
-    camera.position.z -= zoomSpeed; // Камера вперед
+    camera.position.z -= camera_zoomSpeed; // Камера вперед
   } else {
-    camera.position.z += zoomSpeed; // Камера назад
+    camera.position.z += camera_zoomSpeed; // Камера назад
   }
 };
 
@@ -57,7 +56,6 @@ export const handleKeyUp = (
 };
 
 export const handleMouseMove = (camera: THREE.Camera, event: MouseEvent) => {
-  const rotateSpeed = 0.005;
-  camera.rotation.y -= event.movementX * rotateSpeed;
-  camera.rotation.x -= event.movementY * rotateSpeed;
+  camera.rotation.y -= event.movementX * camera_rotateSpeed;
+  camera.rotation.x -= event.movementY * camera_rotateSpeed;
 };
