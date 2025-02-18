@@ -55,6 +55,7 @@ export const handleKeyUp = (
   }
 };
 
+//кажется не работает
 export const handleMouseMove = (camera: THREE.Camera, event: MouseEvent) => {
   camera.rotation.y -= event.movementX * camera_rotateSpeed;
   camera.rotation.x -= event.movementY * camera_rotateSpeed;

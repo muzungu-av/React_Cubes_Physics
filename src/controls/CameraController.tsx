@@ -76,6 +76,7 @@ const CameraController = () => {
       handleKeyUp(event, setMovement);
     };
 
+    //кажется не работает
     const mouseMoveHandler = (event: MouseEvent) => {
       if (ctrlPressed && isDragging) {
         handleMouseMove(camera, event);

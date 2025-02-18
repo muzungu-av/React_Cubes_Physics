@@ -79,7 +79,21 @@ export function Model() {
     mass: 0, // Стена не должна перемещаться
   }));
 
-  // Создайте плоскость, на которой объекты будут падать
+  //верхняя полка
+  const [tableRef_polka_verh] = useBox(() => ({
+    args: [1.8, 0.03, 0.25], // Размеры стены по X, Y, Z  [x, толщина, z]
+    position: [0, 1.08, 0.14], // Положение стены  [x, высота, z]
+    mass: 0, // Стена не должна перемещаться
+  }));
+
+  //нижняя полка
+  const [tableRef_polka_niz] = useBox(() => ({
+    args: [1.8, 0.03, 0.25], // Размеры стены по X, Y, Z
+    position: [0, 0.89, 0.14], // Положение стены
+    mass: 0, // Стена не должна перемещаться
+  }));
+
+  // плоскость, на которой объекты будут падать
   const [floorRef] = usePlane(() => ({
     mass: 0,
     args: [10, 10], // Размеры плоскости
@@ -96,7 +110,12 @@ export function Model() {
       <mesh ref={tableRef_2 as MutableRefObject<Mesh>}>
         <meshStandardMaterial />
       </mesh>
-
+      <mesh ref={tableRef_polka_niz as MutableRefObject<Mesh>}>
+        <meshStandardMaterial />
+      </mesh>
+      <mesh ref={tableRef_polka_verh as MutableRefObject<Mesh>}>
+        <meshStandardMaterial />
+      </mesh>
       {/* Невидимая стена */}
       <mesh ref={floorRef as MutableRefObject<Mesh>}>
         <meshStandardMaterial />
