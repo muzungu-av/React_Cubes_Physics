@@ -59,6 +59,7 @@ const CameraController = () => {
   });
   const [ctrlPressed, setCtrlPressed] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [isUIFocused, setIsUIFocused] = useState(false); // Новое состояние для отслеживания фокуса на UI
 
   useEffect(() => {
     const wheelHandler = handleWheel(camera);
@@ -76,27 +77,42 @@ const CameraController = () => {
       handleKeyUp(event, setMovement);
     };
 
-    //кажется не работает
     const mouseMoveHandler = (event: MouseEvent) => {
-      if (ctrlPressed && isDragging) {
+      if (ctrlPressed && isDragging && !isUIFocused) {
         handleMouseMove(camera, event);
       }
     };
 
     const mouseDownHandler = (event: MouseEvent) => {
-      if (ctrlPressed) {
+      console.log("Mouse down event:", event.target);
+      if (event.target instanceof HTMLCanvasElement && ctrlPressed) {
+        console.log("setIsDragging true");
         setIsDragging(true);
-        event.preventDefault(); // Предотвращение стандартного поведения
-        gl.domElement.requestPointerLock(); // Захват указателя
-      } else {
-        event.preventDefault(); // Отключение захвата сцены при простом клике
+        event.preventDefault();
+        gl.domElement.requestPointerLock();
       }
     };
 
-    const mouseUpHandler = () => {
-      setIsDragging(false);
-      document.exitPointerLock(); // Освобождение захвата указателя
+    const mouseUpHandler = (event: MouseEvent) => {
+      console.log("Mouse up event", event.target);
+      if (isDragging) {
+        console.log("setIsDragging false");
+        setIsDragging(false);
+        document.exitPointerLock();
+      }
     };
+
+    // Добавление обработчиков для событий UI
+    const handleUIMouseEnter = () => setIsUIFocused(true);
+    const handleUIMouseLeave = () => setIsUIFocused(false);
+
+    // Предполагаем, что у вас есть доступ к элементам UI через ref или селектор
+    const uiElements = document.querySelectorAll(".ui-element"); // Замените '.ui-element' на ваш класс или идентификатор элементов UI
+    uiElements.forEach((element) => {
+      element.addEventListener("mouseenter", handleUIMouseEnter);
+      element.addEventListener("mouseleave", handleUIMouseLeave);
+      element.addEventListener("click", (event) => event.stopPropagation()); // Остановка распространения события клика
+    });
 
     window.addEventListener("wheel", wheelHandler);
     window.addEventListener("keydown", keyDownHandler);
@@ -112,8 +128,15 @@ const CameraController = () => {
       window.removeEventListener("mousemove", mouseMoveHandler);
       gl.domElement.removeEventListener("mousedown", mouseDownHandler);
       window.removeEventListener("mouseup", mouseUpHandler);
+      uiElements.forEach((element) => {
+        element.removeEventListener("mouseenter", handleUIMouseEnter);
+        element.removeEventListener("mouseleave", handleUIMouseLeave);
+        element.removeEventListener("click", (event) =>
+          event.stopPropagation()
+        );
+      });
     };
-  }, [camera, ctrlPressed, gl, isDragging]);
+  }, [camera, ctrlPressed, gl, isDragging, isUIFocused]);
 
   useFrame(() => {
     if (movement.up) camera.position.y += camera_moveSpeed;
