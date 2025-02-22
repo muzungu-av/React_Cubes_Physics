@@ -58,8 +58,8 @@ const CameraController = () => {
     right: false,
   });
   const [ctrlPressed, setCtrlPressed] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isUIFocused, setIsUIFocused] = useState(false); // Новое состояние для отслеживания фокуса на UI
+  // const [isDragging, setIsDragging] = useState(false);
+  // const [isUIFocused, setIsUIFocused] = useState(false); // Новое состояние для отслеживания фокуса на UI
 
   useEffect(() => {
     const wheelHandler = handleWheel(camera);
@@ -77,66 +77,66 @@ const CameraController = () => {
       handleKeyUp(event, setMovement);
     };
 
-    const mouseMoveHandler = (event: MouseEvent) => {
-      if (ctrlPressed && isDragging && !isUIFocused) {
-        handleMouseMove(camera, event);
-      }
-    };
+    // const mouseMoveHandler = (event: MouseEvent) => {
+    //   if (ctrlPressed && isDragging && !isUIFocused) {
+    //     handleMouseMove(camera, event);
+    //   }
+    // };
 
-    const mouseDownHandler = (event: MouseEvent) => {
-      console.log("Mouse down event:", event.target);
-      if (event.target instanceof HTMLCanvasElement && ctrlPressed) {
-        console.log("setIsDragging true");
-        setIsDragging(true);
-        event.preventDefault();
-        gl.domElement.requestPointerLock();
-      }
-    };
+    // const mouseDownHandler = (event: MouseEvent) => {
+    //   console.log("Mouse down event:", event.target);
+    //   if (event.target instanceof HTMLCanvasElement && ctrlPressed) {
+    //     console.log("setIsDragging true");
+    //     setIsDragging(true);
+    //     event.preventDefault();
+    //     gl.domElement.requestPointerLock();
+    //   }
+    // };
 
-    const mouseUpHandler = (event: MouseEvent) => {
-      console.log("Mouse up event", event.target);
-      if (isDragging) {
-        console.log("setIsDragging false");
-        setIsDragging(false);
-        document.exitPointerLock();
-      }
-    };
+    // const mouseUpHandler = (event: MouseEvent) => {
+    //   console.log("Mouse up event", event.target);
+    //   if (isDragging) {
+    //     console.log("setIsDragging false");
+    //     setIsDragging(false);
+    //     document.exitPointerLock();
+    //   }
+    // };
 
     // Добавление обработчиков для событий UI
-    const handleUIMouseEnter = () => setIsUIFocused(true);
-    const handleUIMouseLeave = () => setIsUIFocused(false);
+    // const handleUIMouseEnter = () => setIsUIFocused(true);
 
     // Предполагаем, что у вас есть доступ к элементам UI через ref или селектор
-    const uiElements = document.querySelectorAll(".ui-element"); // Замените '.ui-element' на ваш класс или идентификатор элементов UI
-    uiElements.forEach((element) => {
-      element.addEventListener("mouseenter", handleUIMouseEnter);
-      element.addEventListener("mouseleave", handleUIMouseLeave);
-      element.addEventListener("click", (event) => event.stopPropagation()); // Остановка распространения события клика
-    });
+    // const uiElements = document.querySelectorAll(".ui-element"); // Замените '.ui-element' на ваш класс или идентификатор элементов UI
+    // uiElements.forEach((element) => {
+    //   element.addEventListener("mouseenter", handleUIMouseEnter);
+    //   element.addEventListener("mouseleave", handleUIMouseLeave);
+    //   element.addEventListener("click", (event) => event.stopPropagation()); // Остановка распространения события клика
+    // });
 
     window.addEventListener("wheel", wheelHandler);
     window.addEventListener("keydown", keyDownHandler);
     window.addEventListener("keyup", keyUpHandler);
-    window.addEventListener("mousemove", mouseMoveHandler);
-    gl.domElement.addEventListener("mousedown", mouseDownHandler);
-    window.addEventListener("mouseup", mouseUpHandler);
+    // window.addEventListener("mousemove", mouseMoveHandler);
+    // gl.domElement.addEventListener("mousedown", mouseDownHandler);
+    // window.addEventListener("mouseup", mouseUpHandler);
 
     return () => {
       window.removeEventListener("wheel", wheelHandler);
       window.removeEventListener("keydown", keyDownHandler);
       window.removeEventListener("keyup", keyUpHandler);
-      window.removeEventListener("mousemove", mouseMoveHandler);
-      gl.domElement.removeEventListener("mousedown", mouseDownHandler);
-      window.removeEventListener("mouseup", mouseUpHandler);
-      uiElements.forEach((element) => {
-        element.removeEventListener("mouseenter", handleUIMouseEnter);
-        element.removeEventListener("mouseleave", handleUIMouseLeave);
-        element.removeEventListener("click", (event) =>
-          event.stopPropagation()
-        );
-      });
+      // window.removeEventListener("mousemove", mouseMoveHandler);
+      // gl.domElement.removeEventListener("mousedown", mouseDownHandler);
+      // window.removeEventListener("mouseup", mouseUpHandler);
+      // uiElements.forEach((element) => {
+      //   element.removeEventListener("mouseenter", handleUIMouseEnter);
+      //   element.removeEventListener("mouseleave", handleUIMouseLeave);
+      //   element.removeEventListener("click", (event) =>
+      //     event.stopPropagation()
+      //   );
+      // });
     };
-  }, [camera, ctrlPressed, gl, isDragging, isUIFocused]);
+    // }, [camera, ctrlPressed, gl, isDragging, isUIFocused]);
+  }, [camera, ctrlPressed, gl]);
 
   useFrame(() => {
     if (movement.up) camera.position.y += camera_moveSpeed;

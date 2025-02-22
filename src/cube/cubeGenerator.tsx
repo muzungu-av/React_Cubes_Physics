@@ -46,12 +46,12 @@ const cubesMap: { [key: number]: React.ComponentType<Partial<CubeProps>> } = {
 export const CubeGenerator: React.FC = () => {
   return (
     <>
-      {arr.map((cube) => {
+      {arr.map((cube, index) => {
         const CubeComponent = cubesMap[cube.gsi];
         if (CubeComponent) {
           return (
             <CubeComponent
-              key={cube.gsi}
+              key={`${cube.gsi}-${index}`}
               position={cube.position as [number, number, number]}
               rotation={cube.rotation as [number, number, number]}
             />

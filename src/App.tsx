@@ -1,9 +1,7 @@
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { Model } from "./Table_final";
 import { useEffect, useState } from "react";
-import { PointerLockControls } from "@react-three/drei";
-import { Physics } from "@react-three/cannon";
-import { Debug } from "@react-three/cannon";
+import { Physics, Debug } from "@react-three/cannon";
 import { G, light_intensity } from "./const/world_const";
 import { CubeGenerator } from "./cube/cubeGenerator";
 import CameraController from "./controls/CameraController";
@@ -21,19 +19,14 @@ interface StyledSideMenuProps {
   isMenuOpen: boolean;
 }
 
+// Панель с кнопкой
 const ControlPanel: React.FC<ControlPanelProps> = ({ onToggleMenu }) => {
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    console.log("Button clicked, calling onToggleMenu");
-    onToggleMenu();
-  };
   return (
     <StyledControlPanel>
       <button
-        z-index={99999}
         className="ui-element"
         onMouseDown={(e) => e.stopPropagation()}
-        onClick={handleClick}
+        onClick={onToggleMenu}
       >
         Toggle Menu
       </button>
@@ -41,37 +34,26 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onToggleMenu }) => {
   );
 };
 
+// Боковое меню
 const SideMenu: React.FC<SideMenuProps> = ({ isMenuOpen }) => {
   return <StyledSideMenu isMenuOpen={isMenuOpen}>Меню</StyledSideMenu>;
 };
 
+// Основной контейнер
 const StyledAppContainer = styled.div`
   width: 100vw;
   height: 100vh;
-  margin: 0;
-  padding: 0;
   display: flex;
-  flex-direction: column;
   overflow: hidden;
+  flex-direction: column;
 `;
 
-const StyledControlPanel = styled.div`
-  height: 50px;
-  width: 100%;
-  background-color: #f0f0f0;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-// Типизируем пропсы для StyledSideMenu
-const StyledSideMenu = styled.div<StyledSideMenuProps>`
-  width: ${(props) => (props.isMenuOpen ? "200px" : "0")};
+// Контейнер для бокового меню
+const StyledSideMenu = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "isMenuOpen",
+})<StyledSideMenuProps>`
+  display: ${({ isMenuOpen }) => (isMenuOpen ? "block" : "none")};
+  width: ${({ isMenuOpen }) => (isMenuOpen ? "200px" : "0")};
   height: calc(100vh - 50px);
   background-color: #e0e0e0;
   position: fixed;
@@ -82,46 +64,54 @@ const StyledSideMenu = styled.div<StyledSideMenuProps>`
   overflow-y: auto;
   overflow-x: hidden;
   transition: width 0.3s ease;
+  pointer-events: ${({ isMenuOpen }) => (isMenuOpen ? "auto" : "none")};
 `;
 
-// Типизируем пропсы для StyledCanvasBox
+// Контейнер для Canvas
 const StyledCanvasBox = styled.div<StyledSideMenuProps>`
-  margin-top: 50px;
   margin-left: ${(props) => (props.isMenuOpen ? "200px" : "0")};
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #ffffff;
-  overflow: hidden;
+  background-color: #fff;
   position: relative;
-  transition: margin-left 0.3s ease;
 
   canvas {
-    width: calc(100% - 40px);
-    height: calc(100% - 40px);
     position: absolute;
-    top: 10px;
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
-    margin: 0;
-    padding: 0;
+    top: 0px;
+    left: 0px;
+    margin: 0px;
+    padding: 0px;
     pointer-events: ${(props) => (props.isMenuOpen ? "none" : "auto")};
   }
 `;
 
+// Панель с кнопкой
+const StyledControlPanel = styled.div`
+  height: 50px;
+  width: 100%;
+  background-color: #e0f0a0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+// Основной компонент приложения
 const App = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
 
   useEffect(() => {
     console.log("Menu state changed to:", isMenuOpen);
   }, [isMenuOpen]);
 
   const toggleMenu = () => {
-    console.log(">>>>" + isMenuOpen);
-    setIsMenuOpen(!isMenuOpen);
-    console.log(">>>>" + isMenuOpen);
+    setIsMenuOpen((prev) => !prev);
   };
 
   return (
@@ -131,7 +121,6 @@ const App = () => {
       <StyledCanvasBox isMenuOpen={isMenuOpen}>
         <Canvas>
           <ambientLight intensity={light_intensity} />
-          {/*справа, вверху, спереди*/}
           <directionalLight
             color="white"
             intensity={light_intensity}
@@ -147,14 +136,12 @@ const App = () => {
             intensity={light_intensity}
             position={[1, 1, 5]}
           />
-          {/* ["вправо-влево", "высота", "ближе" ] */}
           <Physics gravity={[0, G, -0.001]}>
-            <Debug color="red" scale={1.1}>
-              <CubeGenerator />
-              <Model />
-            </Debug>
+            {/* <Debug color="red" scale={1.1}> */}
+            <CubeGenerator />
+            <Model />
+            {/* </Debug> */}
           </Physics>
-          <PointerLockControls />
           <CameraController />
         </Canvas>
       </StyledCanvasBox>
