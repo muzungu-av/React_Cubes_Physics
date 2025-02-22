@@ -1,11 +1,12 @@
 import { Canvas } from "@react-three/fiber";
 import { Model } from "./Table_final";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Physics, Debug } from "@react-three/cannon";
 import { G, light_intensity } from "./const/world_const";
 import { CubeGenerator } from "./cube/cubeGenerator";
 import CameraController from "./controls/CameraController";
 import styled from "styled-components";
+import { PointerLockControls } from "@react-three/drei";
 
 interface ControlPanelProps {
   onToggleMenu: () => void;
@@ -105,10 +106,60 @@ const StyledControlPanel = styled.div`
 // Основной компонент приложения
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const controlsRef = useRef<any>(null); // Ссылка на PointerLockControls
+  const [isPointerLocked, setIsPointerLocked] = useState(false);
 
   useEffect(() => {
     console.log("Menu state changed to:", isMenuOpen);
   }, [isMenuOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && controlsRef.current) {
+        controlsRef.current.lock();
+      }
+
+      if (event.code === "KeyF") {
+        setIsPointerLocked((prev) => !prev); // Переключаем состояние
+      }
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (!event.ctrlKey && controlsRef.current) {
+        controlsRef.current.unlock();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
+  // useEffect(() => {
+  //   const handleKeyDown = (event: KeyboardEvent) => {
+  //     if (event.ctrlKey && controlsRef.current) {
+  //       controlsRef.current.lock(); // Включаем управление
+  //     }
+  //   };
+
+  //   const handleKeyUp = (event: KeyboardEvent) => {
+  //     if (!event.ctrlKey && controlsRef.current) {
+  //       controlsRef.current.unlock(); // Выключаем управление
+  //     }
+  //   };
+
+  //   document.addEventListener("keydown", handleKeyDown);
+  //   document.addEventListener("keyup", handleKeyUp);
+
+  //   return () => {
+  //     document.removeEventListener("keydown", handleKeyDown);
+  //     document.removeEventListener("keyup", handleKeyUp);
+  //   };
+  // }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
@@ -118,7 +169,10 @@ const App = () => {
     <StyledAppContainer>
       <ControlPanel onToggleMenu={toggleMenu} />
       <SideMenu isMenuOpen={isMenuOpen} />
-      <StyledCanvasBox isMenuOpen={isMenuOpen}>
+      <StyledCanvasBox
+        isMenuOpen={isMenuOpen}
+        onPointerDown={(e) => e.stopPropagation()}
+      >
         <Canvas>
           <ambientLight intensity={light_intensity} />
           <directionalLight
@@ -143,6 +197,7 @@ const App = () => {
             {/* </Debug> */}
           </Physics>
           <CameraController />
+          {isPointerLocked && <PointerLockControls ref={controlsRef} />}
         </Canvas>
       </StyledCanvasBox>
     </StyledAppContainer>
