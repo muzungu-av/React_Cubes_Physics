@@ -14,8 +14,8 @@
 
 ```bash
 # Клонировать репозиторий
-git clone https://github.com/your-username/3d-cube-physics-simulation.git
-cd 3d-cube-physics-simulation
+git clone https://github.com/muzungu-av/React_Cubes_Physics.git
+cd React_Cubes_Physics
 
 # Установить зависимости
 yarn install
