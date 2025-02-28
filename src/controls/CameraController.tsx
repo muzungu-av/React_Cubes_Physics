@@ -4,7 +4,7 @@ import {
   handleKeyDown,
   handleKeyUp,
   handleWheel,
-  handleMouseMove,
+  // handleMouseMove,
 } from "./control_type_1";
 import {
   camera_moveSpeed,

@@ -1,0 +1,58 @@
+Доступ к физическому миру при необходимости
+Если вашим компонентам (CubeGenerator, Model) нужен прямой доступ к world для кастомных манипуляций (например, добавления сил или тел вручную), вы можете использовать хук useCannon или useFrame из @react-three/fiber:
+jsx
+import { useFrame } from '@react-three/fiber';
+import { useCannon } from '@react-three/cannon';
+
+function CubeGenerator() {
+  const [ref, api] = useCannon({ mass: 1 }, (body) => {
+    body.position.set(0, 5, 0); // Начальная позиция куба
+  });
+
+  useFrame(({ clock }) => {
+    // Пример: кастомное управление физикой
+    api.applyForce([Math.sin(clock.elapsedTime) * 10, 0, 0], [0, 0, 0]);
+  });
+
+  return <mesh ref={ref} />;
+}
+Здесь <Physics> уже предоставляет мир, а useCannon позволяет добавлять тела в него декларативно.
+
+
+=================================================
+
+Централизация конфигурации физики
+Если у вас есть сложные настройки физического мира (например, не только гравитация, но и broadphase, solver iterations и т.д.), вы можете вынести их в отдельный объект или хук, чтобы упростить управление:
+
+
+const usePhysicsConfig = () => ({
+  gravity: [0, G, -0.001],
+  broadphase: 'SAP', // Оптимизация для столкновений
+  iterations: 10,    // Количество итераций солвера
+});
+
+function App() {
+  const physicsConfig = usePhysicsConfig();
+
+  return (
+    <StyledAppContainer>
+      <ControlPanel onToggleMenu={toggleMenu} />
+      <SideMenu isMenuOpen={isMenuOpen} />
+      <StyledCanvasBox
+        isMenuOpen={isMenuOpen}
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        <Canvas>
+          <ambientLight intensity={light_intensity} />
+          <directionalLight color="white" intensity={light_intensity} position={[0, 3, 2]} />
+          <Physics {...physicsConfig}>
+            <CubeGenerator />
+            <Model />
+          </Physics>
+          <CameraController />
+          {isPointerLocked && <PointerLockControls ref={controlsRef} />}
+        </Canvas>
+      </StyledCanvasBox>
+    </StyledAppContainer>
+  );
+}

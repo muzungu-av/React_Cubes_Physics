@@ -191,10 +191,10 @@ const App = () => {
             position={[1, 1, 5]}
           />
           <Physics gravity={[0, G, -0.001]}>
-            {/* <Debug color="red" scale={1.1}> */}
-            <CubeGenerator />
-            <Model />
-            {/* </Debug> */}
+            <Debug color="red" scale={1.1}>
+              <CubeGenerator />
+              <Model />
+            </Debug>
           </Physics>
           <CameraController />
           {isPointerLocked && <PointerLockControls ref={controlsRef} />}
