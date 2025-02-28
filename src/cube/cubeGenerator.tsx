@@ -14,20 +14,8 @@ interface CubeProps {
 }
 
 const arr: CubeInfo[] = [
-  // { gsi: 18, position: [0, 3.9, 0.4], rotation: [1.0, 3.5, 1.0] },
-  // { gsi: 235, position: [-0.2, 3, 0.35], rotation: [0.5, -0.9, 0] },
-  // { gsi: 240, position: [0.2, 3.7, 0.6], rotation: [-0.3, -1.1, 0] },
-  // { gsi: 18, position: [0, 2.9, 0.7], rotation: [1.0, 3.5, 1.0] },
-  // { gsi: 235, position: [-0.2, 2, 0.75], rotation: [0.5, -0.9, 0] },
-
-  // { gsi: 18, position: [-0.7, 2.8, 0.6], rotation: [1.0, 3.5, 1.0] },
-  // { gsi: 235, position: [-0.2, 3, 0.75], rotation: [0.5, -0.9, 0] },
-  // { gsi: 18, position: [0.2, 2.7, 1.05], rotation: [-0.3, -1.1, 0] },
-  // { gsi: 240, position: [0.8, 2.5, 0.7], rotation: [1.0, 3.5, 1.0] },
-  // { gsi: 235, position: [-0.5, 2, 0.45], rotation: [0.5, -0.9, 0] },
-
   /*
-  над верхней полкой [0, 1.7, 0.15]
+    над верхней полкой [0, 1.7, 0.15]
   */
   { gsi: 241, position: [-0.3, 1.7, 0.15], rotation: [0.3, -0.9, 0] }, //["вправо-влево", "высота", "ближе" ]
   { gsi: 236, position: [-0.15, 1.7, 0.5], rotation: [1.3, 1.1, 0] },

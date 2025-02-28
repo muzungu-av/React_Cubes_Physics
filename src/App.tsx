@@ -7,40 +7,30 @@ import { CubeGenerator } from "./cube/cubeGenerator";
 import CameraController from "./controls/CameraController";
 import styled from "styled-components";
 import { PointerLockControls } from "@react-three/drei";
-
-interface ControlPanelProps {
-  onToggleMenu: () => void;
-}
+import { ControlPanel } from "./ControlPanel";
 
 interface SideMenuProps {
   isMenuOpen: boolean;
+  error: string | null;
 }
 
 interface StyledSideMenuProps {
   isMenuOpen: boolean;
 }
 
-// Панель с кнопкой
-const ControlPanel: React.FC<ControlPanelProps> = ({ onToggleMenu }) => {
+const SideMenu: React.FC<SideMenuProps> = ({ isMenuOpen, error }) => {
   return (
-    <StyledControlPanel>
-      <button
-        className="ui-element"
-        onMouseDown={(e) => e.stopPropagation()}
-        onClick={onToggleMenu}
-      >
-        Toggle Menu
-      </button>
-    </StyledControlPanel>
+    <StyledSideMenu isMenuOpen={isMenuOpen}>
+      <div style={{ padding: "10px" }}>
+        {error && (
+          <div style={{ color: "red", marginTop: "10px" }}>Ошибка: {error}</div>
+        )}
+        {!error && <p>Введите текст и отправьте запрос</p>}
+      </div>
+    </StyledSideMenu>
   );
 };
 
-// Боковое меню
-const SideMenu: React.FC<SideMenuProps> = ({ isMenuOpen }) => {
-  return <StyledSideMenu isMenuOpen={isMenuOpen}>Меню</StyledSideMenu>;
-};
-
-// Основной контейнер
 const StyledAppContainer = styled.div`
   width: 100vw;
   height: 100vh;
@@ -49,7 +39,6 @@ const StyledAppContainer = styled.div`
   flex-direction: column;
 `;
 
-// Контейнер для бокового меню
 const StyledSideMenu = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== "isMenuOpen",
 })<StyledSideMenuProps>`
@@ -68,7 +57,6 @@ const StyledSideMenu = styled.div.withConfig({
   pointer-events: ${({ isMenuOpen }) => (isMenuOpen ? "auto" : "none")};
 `;
 
-// Контейнер для Canvas
 const StyledCanvasBox = styled.div<StyledSideMenuProps>`
   margin-left: ${(props) => (props.isMenuOpen ? "200px" : "0")};
   flex: 1;
@@ -88,26 +76,49 @@ const StyledCanvasBox = styled.div<StyledSideMenuProps>`
   }
 `;
 
-// Панель с кнопкой
-const StyledControlPanel = styled.div`
-  height: 50px;
-  width: 100%;
-  background-color: #e0f0a0;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-// Основной компонент приложения
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
-  const controlsRef = useRef<any>(null); // Ссылка на PointerLockControls
+  const controlsRef = useRef<any>(null);
   const [isPointerLocked, setIsPointerLocked] = useState(false);
+  const [inputText, setInputText] = useState("АУЮ");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    try {
+      setError(null);
+
+      const response = await fetch("http://172.18.0.3:8080/api/word", {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain",
+        },
+        body: inputText,
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+
+      // Обработка массива результата
+      data.forEach((item: any) => {
+        if (item.error === true) {
+          console.log("Ошибка в элементе:", {
+            tailOfWord: item.tailOfWord,
+            error: item.error,
+          });
+        } else if (item.error === false) {
+          console.log("Успешный элемент:", {
+            symbol: item.headSyllable.symbol,
+            globalSyllableIndex: item.headSyllable.globalSyllableIndex,
+          });
+        }
+      });
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  };
 
   useEffect(() => {
     console.log("Menu state changed to:", isMenuOpen);
@@ -118,9 +129,8 @@ const App = () => {
       if (event.ctrlKey && controlsRef.current) {
         controlsRef.current.lock();
       }
-
       if (event.code === "KeyF") {
-        setIsPointerLocked((prev) => !prev); // Переключаем состояние
+        setIsPointerLocked((prev) => !prev);
       }
     };
 
@@ -139,36 +149,19 @@ const App = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   const handleKeyDown = (event: KeyboardEvent) => {
-  //     if (event.ctrlKey && controlsRef.current) {
-  //       controlsRef.current.lock(); // Включаем управление
-  //     }
-  //   };
-
-  //   const handleKeyUp = (event: KeyboardEvent) => {
-  //     if (!event.ctrlKey && controlsRef.current) {
-  //       controlsRef.current.unlock(); // Выключаем управление
-  //     }
-  //   };
-
-  //   document.addEventListener("keydown", handleKeyDown);
-  //   document.addEventListener("keyup", handleKeyUp);
-
-  //   return () => {
-  //     document.removeEventListener("keydown", handleKeyDown);
-  //     document.removeEventListener("keyup", handleKeyUp);
-  //   };
-  // }, []);
-
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
   };
 
   return (
     <StyledAppContainer>
-      <ControlPanel onToggleMenu={toggleMenu} />
-      <SideMenu isMenuOpen={isMenuOpen} />
+      <ControlPanel
+        onToggleMenu={toggleMenu}
+        inputText={inputText}
+        setInputText={setInputText}
+        handleSubmit={handleSubmit}
+      />
+      <SideMenu isMenuOpen={isMenuOpen} error={error} />
       <StyledCanvasBox
         isMenuOpen={isMenuOpen}
         onPointerDown={(e) => e.stopPropagation()}
