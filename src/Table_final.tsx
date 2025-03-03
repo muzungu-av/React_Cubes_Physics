@@ -79,6 +79,30 @@ export function Model() {
     mass: 0, // Стена не должна перемещаться
   }));
 
+  //ограничитель справа
+  const [tableRef_right] = useBox(() => ({
+    args: [1, 0.04, 0.5], // Размеры стены по X, Y, Z
+    position: [1, 0.8, 0.55], // Положение стены
+    rotation: [Math.PI / 2, 0, Math.PI / 2],
+    mass: 0, // Стена не должна перемещаться
+  }));
+
+  //ограничитель слева
+  const [tableRef_left] = useBox(() => ({
+    args: [1, 0.04, 0.5], // Размеры стены по X, Y, Z
+    position: [-1, 0.8, 0.55], // Положение стены
+    rotation: [Math.PI / 2, 0, Math.PI / 2],
+    mass: 0, // Стена не должна перемещаться
+  }));
+
+  //ограничитель спереди
+  const [tableRef_front] = useBox(() => ({
+    args: [0.55, 0.04, 1.9], // Размеры стены по X, Y, Z
+    position: [0, 0.8, 1.1], // Положение стены
+    rotation: [Math.PI / 2, Math.PI / 2, 0],
+    mass: 0, // Стена не должна перемещаться
+  }));
+
   //верхняя полка
   const [tableRef_polka_verh] = useBox(() => ({
     args: [1.8, 0.03, 0.25], // Размеры стены по X, Y, Z  [x, толщина, z]
@@ -110,6 +134,19 @@ export function Model() {
       <mesh ref={tableRef_2 as MutableRefObject<Mesh>}>
         <meshStandardMaterial />
       </mesh>
+
+      <mesh ref={tableRef_right as MutableRefObject<Mesh>}>
+        <meshStandardMaterial />
+      </mesh>
+
+      <mesh ref={tableRef_left as MutableRefObject<Mesh>}>
+        <meshStandardMaterial />
+      </mesh>
+
+      <mesh ref={tableRef_front as MutableRefObject<Mesh>}>
+        <meshStandardMaterial />
+      </mesh>
+
       <mesh ref={tableRef_polka_niz as MutableRefObject<Mesh>}>
         <meshStandardMaterial />
       </mesh>

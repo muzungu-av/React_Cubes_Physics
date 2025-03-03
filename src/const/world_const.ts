@@ -1,7 +1,7 @@
 export const hBig = 0.1;
 export const hSmall = parseFloat((hBig * 0.8).toFixed(2));
 export const mass = 1;
-export const G = -1;
+export const G = -1.1;
 
 export const camera_moveSpeed = 0.01;
 export const camera_zoomSpeed = 0.1; //скорость колеса мыши
