@@ -117,7 +117,9 @@ const App = () => {
           ],
         }));
 
-      setCubeData(transformedData);
+      // setCubeData(transformedData);
+      // Добавляем новые элементы к существующему состоянию
+      setCubeData((prevData) => [...prevData, ...transformedData]);
     } catch (err) {
       setError((err as Error).message);
     }
