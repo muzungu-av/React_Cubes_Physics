@@ -85,7 +85,7 @@ const App = () => {
   const [error, setError] = useState<string | null>(null);
   const [cubeData, setCubeData] = useState<CubeInfo[]>([]); // Хранение данных для кубов
 
-  const handleSubmit = async () => {
+  const handleDrop = async () => {
     try {
       setError(null);
 
@@ -114,13 +114,18 @@ const App = () => {
             number,
             number,
             number
-          ], // По умолчанию
+          ],
         }));
 
       setCubeData(transformedData);
     } catch (err) {
       setError((err as Error).message);
     }
+  };
+
+  const handleErase = async () => {
+    const data: CubeInfo[] = [];
+    setCubeData(data);
   };
 
   useEffect(() => {
@@ -162,7 +167,8 @@ const App = () => {
         onToggleMenu={toggleMenu}
         inputText={inputText}
         setInputText={setInputText}
-        handleSubmit={handleSubmit}
+        handleDrop={handleDrop}
+        handleErase={handleErase}
       />
       <SideMenu isMenuOpen={isMenuOpen} error={error} />
       <StyledCanvasBox

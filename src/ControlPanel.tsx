@@ -5,7 +5,8 @@ interface ControlPanelProps {
   onToggleMenu: () => void;
   inputText: string;
   setInputText: (value: string) => void;
-  handleSubmit: () => void;
+  handleDrop: () => void;
+  handleErase: () => void;
 }
 
 // Стилизованная панель управления
@@ -28,7 +29,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   onToggleMenu,
   inputText,
   setInputText,
-  handleSubmit,
+  handleDrop,
+  handleErase,
 }) => {
   return (
     <StyledControlPanel>
@@ -47,8 +49,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           placeholder="Введите слова"
           style={{ padding: "5px", marginRight: "10px" }}
         />
-        <button onClick={handleSubmit} style={{ padding: "5px 15px" }}>
-          Отправить
+        <button onClick={handleDrop} style={{ padding: "5px 15px" }}>
+          СБРОС
+        </button>
+        <button onClick={handleErase} style={{ padding: "5px 15px" }}>
+          ОЧИСТКА
         </button>
       </div>
     </StyledControlPanel>
