@@ -1,9 +1,10 @@
 import { Canvas } from "@react-three/fiber";
 import { Model } from "./Table_final";
 import { useEffect, useRef, useState } from "react";
-import { Physics, Debug } from "@react-three/cannon";
+import { Physics } from "@react-three/cannon";
+// import { Debug } from "@react-three/cannon";
 import { G, light_intensity } from "./const/world_const";
-import { CubeGenerator } from "./cube/cubeGenerator";
+import { CubeGenerator, CubeInfo } from "./cube/cubeGenerator";
 import CameraController from "./controls/CameraController";
 import styled from "styled-components";
 import { PointerLockControls } from "@react-three/drei";
@@ -77,17 +78,18 @@ const StyledCanvasBox = styled.div<StyledSideMenuProps>`
 `;
 
 const App = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const controlsRef = useRef<any>(null);
   const [isPointerLocked, setIsPointerLocked] = useState(false);
   const [inputText, setInputText] = useState("АУЮ");
   const [error, setError] = useState<string | null>(null);
+  const [cubeData, setCubeData] = useState<CubeInfo[]>([]); // Хранение данных для кубов
 
   const handleSubmit = async () => {
     try {
       setError(null);
 
-      const response = await fetch("http://172.18.0.3:8080/api/word", {
+      const response = await fetch("http://172.18.0.2:8080/api/word", {
         method: "POST",
         headers: {
           "Content-Type": "text/plain",
@@ -99,22 +101,23 @@ const App = () => {
         throw new Error("Network response was not ok");
       }
 
+      // Обработка массива результата
       const data = await response.json();
 
-      // Обработка массива результата
-      data.forEach((item: any) => {
-        if (item.error === true) {
-          console.log("Ошибка в элементе:", {
-            tailOfWord: item.tailOfWord,
-            error: item.error,
-          });
-        } else if (item.error === false) {
-          console.log("Успешный элемент:", {
-            symbol: item.headSyllable.symbol,
-            globalSyllableIndex: item.headSyllable.globalSyllableIndex,
-          });
-        }
-      });
+      // Преобразование JSON в формат CubeInfo
+      const transformedData: CubeInfo[] = data
+        .filter((item: any) => !item.error) // Фильтруем ошибки
+        .map((item: any) => ({
+          gsi: item.headSyllable.gsi,
+          position: item.position as [number, number, number],
+          rotation: [item.rotX, item.rotY, item.rotZ] as [
+            number,
+            number,
+            number
+          ], // По умолчанию
+        }));
+
+      setCubeData(transformedData);
     } catch (err) {
       setError((err as Error).message);
     }
@@ -129,7 +132,7 @@ const App = () => {
       if (event.ctrlKey && controlsRef.current) {
         controlsRef.current.lock();
       }
-      if (event.code === "KeyF") {
+      if (event.code === "Escape") {
         setIsPointerLocked((prev) => !prev);
       }
     };
@@ -184,10 +187,10 @@ const App = () => {
             position={[1, 1, 5]}
           />
           <Physics gravity={[0, G, -0.001]}>
-            <Debug color="red" scale={1.1}>
-              <CubeGenerator />
-              <Model />
-            </Debug>
+            {/* <Debug color="red" scale={1.1}> */}
+            <CubeGenerator cubes={cubeData} />
+            <Model />
+            {/* </Debug> */}
           </Physics>
           <CameraController />
           {isPointerLocked && <PointerLockControls ref={controlsRef} />}

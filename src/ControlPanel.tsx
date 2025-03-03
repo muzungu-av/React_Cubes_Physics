@@ -44,7 +44,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="Введите буквы (например, АУЮ)"
+          placeholder="Введите слова"
           style={{ padding: "5px", marginRight: "10px" }}
         />
         <button onClick={handleSubmit} style={{ padding: "5px 15px" }}>
